@@ -86,3 +86,46 @@ ko.bindingHandlers.observeAllMagicScrollItems = {
 };
 
 ```
+
+# Working solution
+```javascript
+var changedProductsSubscriptions = {};
+var observeChangeArray = ['itemQuantity', 'selectedSKU'];
+
+ko.bindingHandlers.observeAllMagicScrollItems = {
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+
+        var productId = viewModel.id;
+        
+        if(!changedProductsSubscriptions[productId]) {
+            changedProductsSubscriptions[productId] = {};
+        }
+        
+        observeChangeArray.map(function(observeProperty){
+            if(changedProductsSubscriptions[productId][observeProperty]){
+                changedProductsSubscriptions[productId][observeProperty].dispose();
+            }
+            changedProductsSubscriptions[productId][observeProperty] = viewModel[observeProperty].subscribe(syncMagicScrollItems);
+        });
+
+        function syncMagicScrollItems(){
+            var $mcsItem = $(element).parents('.mcs-item');
+            var $mcsItemsContainer = $(element).parents('.mcs-items-container');
+            var mcsItemNumber = $mcsItem.data('item');
+            var mcsItemIndex = $mcsItemsContainer.children().index($mcsItem);
+
+            $mcsItemsContainer.children('.mcs-item').each(function(mappedItemIndex){
+                var $mappedItem = $(this);
+                var mappedItemNumber = $mappedItem.data('item');
+                if(mcsItemNumber == mappedItemNumber && mcsItemIndex != mappedItemIndex){
+                    setTimeout(function(){
+                        $mappedItem.empty();
+                        var clonedNode = element.cloneNode(true);
+                        $mappedItem.append(clonedNode);
+                    }, 1000);
+                }
+            });
+        }
+    }
+};
+```
