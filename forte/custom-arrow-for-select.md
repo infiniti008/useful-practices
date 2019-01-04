@@ -1,3 +1,6 @@
+# Select arrow 
+С помощью градиентов рисуем стрелку и убираем стрелку по умолчанию с помощью псевдокласса и специальных свойств.
+
 ```css
     select {
         background-image: 
@@ -23,4 +26,4 @@
             radial-gradient(#b09e70 100%, #b09e70 100%);
         background-position: calc(97.5%) .8em;
     }
-```
+````
